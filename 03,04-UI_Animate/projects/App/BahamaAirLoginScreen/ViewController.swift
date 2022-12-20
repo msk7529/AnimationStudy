@@ -56,6 +56,7 @@ final class ViewController: UIViewController {
     
     private lazy var animationContainerView: UIView = {
         let view = UIView(frame: view.bounds)
+        view.isUserInteractionEnabled = false
         return view
     }()
     
@@ -67,9 +68,21 @@ final class ViewController: UIViewController {
         return view
     }()
     
-    let status = UIImageView(image: UIImage(named: "banner"))
-    let label = UILabel()
-    let messages = ["Connecting ...", "Authorizing ...", "Sending credentials ...", "Failed"]
+    private let statusImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "banner"))
+        imageView.isHidden = true
+        return imageView
+    }()
+    
+    private lazy var statusLabel: UILabel = {
+        let label = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: statusImageView.frame.size.width, height: statusImageView.frame.size.height))
+        label.font = UIFont(name: "HelveticaNeue", size: 18.0)
+        label.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    let statusMessages = ["Connecting ...", "Authorizing ...", "Sending credentials ...", "Failed"]
     
     var statusPosition = CGPoint.zero
     
@@ -79,21 +92,23 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
 
         view.addSubview(animationContainerView)
-        view.addSubview(status)
-        
-        status.isHidden = true
-        status.center = loginButton.center
-        
+        view.addSubview(statusImageView)
+                
         loginButton.addSubview(spinner)
         
         loginButton.layer.cornerRadius = 8.0
         loginButton.layer.masksToBounds = true
         
-        label.frame = CGRect(x: 0.0, y: 0.0, width: status.frame.size.width, height: status.frame.size.height)
-        label.font = UIFont(name: "HelveticaNeue", size: 18.0)
-        label.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
-        label.textAlignment = .center
-        status.addSubview(label)
+        statusImageView.center = loginButton.center
+        
+        statusImageView.addSubview(statusLabel)
+
+        statusLabel.frame = CGRect(x: 0.0, y: 0.0, width: statusImageView.frame.size.width, height: statusImageView.frame.size.height)
+        statusLabel.font = UIFont(name: "HelveticaNeue", size: 18.0)
+        statusLabel.textColor = UIColor(red: 0.89, green: 0.38, blue: 0.0, alpha: 1.0)
+        statusLabel.textAlignment = .center
+        
+        statusPosition = statusImageView.center
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -175,7 +190,7 @@ final class ViewController: UIViewController {
         
         // 새로운 트랜지션을 생성한다. UIView.animate와 비슷하지만, 여기서는 매개변수로 컨테이너 역할을 하는 UIView를 필요로 한다.
         UIView.transition(with: animationContainerView,
-                          duration: 3.0,
+                          duration: 0.5,
                           options: [.curveEaseOut, .transitionFlipFromBottom],
                           animations: {
             // transitionFlipFromBottom: 뷰의 아래쪽 가장자리로 뷰를 뒤집는다.
@@ -188,10 +203,10 @@ final class ViewController: UIViewController {
           animations: {
             // 뒤집기 애니메이션을 수행하고, someView는 마지막에 제거된다.
             someView.removeFromSuperview()
-          }, completion: nil) */
+          }, completion: nil)
         
         
-        /* hide the view via transition
+        // hide the view via transition
         UIView.transition(with: someView, duration: 0.33,
                           options: [.curveEaseOut, .transitionFlipFromBottom],
                           animations: {
@@ -199,21 +214,23 @@ final class ViewController: UIViewController {
         }, completion: { _ in
             //
             someView.isHidden = true
-        }) */
+        })
         
-        /* replace via transition. 이거 수행하면 전체 뷰가 플립 되는 효과가 생김;;;;
+        // replace via transition. 이거 수행하면 전체 뷰가 플립 되는 효과가 생김;;;;
         UIView.transition(from: password, to: username, duration: 0.33, options: .transitionFlipFromTop) */
 
     }
     
     // MARK: further methods
-    
+
     @IBAction func login() {
         view.endEditing(true)
         
         UIView.animate(withDuration: 1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: [], animations: {
           self.loginButton.bounds.size.width += 80.0
-        }, completion: nil)
+        }, completion: { _ in
+            self.showMessage(index: 0)
+        })
         
         UIView.animate(withDuration: 0.33, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
           self.loginButton.center.y += 60.0
@@ -223,7 +240,39 @@ final class ViewController: UIViewController {
             self.spinner.center = CGPoint(x: 40.0, y: self.loginButton.frame.size.height / 2)
             self.spinner.alpha = 1.0
         })
-
+    }
+    
+    func showMessage(index: Int) {
+        statusLabel.text = statusMessages[index]
+        
+        UIView.transition(with: statusImageView, duration: 0.33,
+                          options: [.curveEaseOut, .transitionCurlDown],
+                          animations: {
+            // transitionCurlDown: 종이를 뒤집는 것처럼 애니메이션을 만든다.
+            self.statusImageView.isHidden = false
+        }, completion: { _ in
+            //transition completion
+            delay(2.0) {
+                if index < self.statusMessages.count - 1 {
+                    self.removeMessage(index: index)
+                } else {
+                    //reset form
+                    // self.resetForm()
+                }
+            }
+        })
+    }
+    
+    func removeMessage(index: Int) {
+        UIView.animate(withDuration: 0.33, delay: 0.0, options: [],
+                       animations: {
+            self.statusImageView.center.x += self.view.frame.size.width     // 화면 밖으로 빼낸다.
+        }, completion: { _ in
+            self.statusImageView.center = self.statusPosition   // 원래 위치로 옮기고 숨긴다.
+            self.statusImageView.isHidden = true
+            
+            self.showMessage(index: index + 1)
+        })
     }
     
     // MARK: UITextFieldDelegate
