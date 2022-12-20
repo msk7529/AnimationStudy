@@ -219,6 +219,10 @@ final class ViewController: UIViewController {
         // replace via transition. 이거 수행하면 전체 뷰가 플립 되는 효과가 생김;;;;
         UIView.transition(from: password, to: username, duration: 0.33, options: .transitionFlipFromTop) */
 
+        animateCloud(cloud1)
+        animateCloud(cloud2)
+        animateCloud(cloud3)
+        animateCloud(cloud4)
     }
     
     // MARK: further methods
@@ -290,6 +294,20 @@ final class ViewController: UIViewController {
             self.loginButton.bounds.size.width -= 80.0
             self.loginButton.center.y -= 60.0
         }, completion: nil)
+    }
+    
+    private func animateCloud(_ cloud: UIImageView) {
+        let cloudSpeed = 60.0 / view.frame.size.width
+        let duration = (view.frame.size.width - cloud.frame.origin.x) * cloudSpeed
+        
+        UIView.animate(withDuration: TimeInterval(duration), delay: 0.0, options: .curveLinear, animations: {
+            // 구름이 화면 밖을 완전히 벗어날때까지 x축 양의 방향으로 서서히 이동시키는 애니메이션을 수행
+            cloud.frame.origin.x = self.view.frame.size.width
+        }, completion: { _ in
+            // 구름이 화면 밖을 완전히 벗어나면, x좌표를 화면을 벗어난 시작지점으로 옮긴다
+            cloud.frame.origin.x = -cloud.frame.size.width
+            self.animateCloud(cloud)
+        })
     }
     
     // MARK: UITextFieldDelegate
