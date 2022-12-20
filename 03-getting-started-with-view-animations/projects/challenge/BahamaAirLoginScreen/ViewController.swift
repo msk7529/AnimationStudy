@@ -38,7 +38,8 @@ func delay(_ seconds: Double, completion: @escaping () -> Void) {
     DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: completion)
 }
 
-class ViewController: UIViewController {
+final class ViewController: UIViewController {
+    
     // MARK: IB outlets
     
     @IBOutlet var loginButton: UIButton!
@@ -88,6 +89,7 @@ class ViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        // 세 개의 UI 요소를 화면 밖으로 위치 시킨다.
         heading.center.x -= view.bounds.width
         username.center.x -= view.bounds.width
         password.center.x -= view.bounds.width
@@ -101,13 +103,23 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        // 가려진 요소들을 자연스럽게 다시 화면에 위치시킨다.
         UIView.animate(withDuration: 0.5) {
             self.heading.center.x += self.view.bounds.width
         }
+        
         UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+            // delay: 애니메이션을 시작하기 전에 UIKit이 대기하는 시간(초)
             self.username.center.x += self.view.bounds.width
         }, completion: nil)
-        UIView.animate(withDuration: 0.5, delay: 0.4, options: [], animations: {
+        
+        UIView.animate(withDuration: 0.5, delay: 0.4, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
+            // repeat: 애니메이션이 영원히 반복됨
+            // autoreverse: repeat와 함께 쓰면 정방향 역방향 애니메이션이 영원히 반복되며, 이것만 쓰면 한 번만 실행됨.
+            // curveLinear: 애니메이션에 가속, 감속을 적용하지 않음
+            // curveEaseIn: 애니메이션의 시작 부분에 가속 적용
+            // curveEaseOut: 애니메이션의 끝 부분에 감속 적용
+            // curveEaseInOut: 애니메이션 시작 시 가속을 하고, 종료 시 감속을 적용 > 가장 자연스러운 옵션
             self.password.center.x += self.view.bounds.width
         }, completion: nil)
         
