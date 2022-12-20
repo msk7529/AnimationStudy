@@ -54,7 +54,14 @@ final class ViewController: UIViewController {
     
     // MARK: further UI
     
-    let spinner = UIActivityIndicatorView(style: .large)
+    private lazy var spinner: UIActivityIndicatorView = {
+        let view = UIActivityIndicatorView(style: .large)
+        view.frame = CGRect(x: -20.0, y: 6.0, width: 20.0, height: 20.0)
+        view.startAnimating()
+        view.alpha = 0
+        return view
+    }()
+    
     let status = UIImageView(image: UIImage(named: "banner"))
     let label = UILabel()
     let messages = ["Connecting ...", "Authorizing ...", "Sending credentials ...", "Failed"]
@@ -67,13 +74,10 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         
         // set up the UI
+        loginButton.addSubview(spinner)
+        
         loginButton.layer.cornerRadius = 8.0
         loginButton.layer.masksToBounds = true
-        
-        spinner.frame = CGRect(x: -20.0, y: 6.0, width: 20.0, height: 20.0)
-        spinner.startAnimating()
-        spinner.alpha = 0.0
-        loginButton.addSubview(spinner)
         
         status.isHidden = true
         status.center = loginButton.center
@@ -111,10 +115,19 @@ final class ViewController: UIViewController {
             self.heading.center.x += self.view.bounds.width
         }
         
-        UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.3, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.0, options: [], animations: {
             // delay: 애니메이션을 시작하기 전에 UIKit이 대기하는 시간(초)
             self.username.center.x += self.view.bounds.width
-        }, completion: nil)
+          },
+          completion: nil
+        )
+        
+        /*
+        UIView.animate(withDuration: 0.5, delay: 0.4, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.0, options: [], animations: {
+            self.password.center.x += self.view.bounds.width
+          },
+          completion: nil
+        )*/
         
         UIView.animate(withDuration: 0.5, delay: 0.4, options: [.repeat, .autoreverse, .curveEaseInOut], animations: {
             // repeat: 애니메이션이 영원히 반복됨
@@ -155,6 +168,20 @@ final class ViewController: UIViewController {
     
     @IBAction func login() {
         view.endEditing(true)
+        
+        UIView.animate(withDuration: 1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: [], animations: {
+          self.loginButton.bounds.size.width += 80.0
+        }, completion: nil)
+        
+        UIView.animate(withDuration: 0.33, delay: 0.0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.0, options: [], animations: {
+          self.loginButton.center.y += 60.0
+        }, completion: { _ in
+            self.loginButton.backgroundColor = UIColor(red: 0.85, green: 0.83, blue: 0.45, alpha: 1.0)
+            
+            self.spinner.center = CGPoint(x: 40.0, y: self.loginButton.frame.size.height / 2)
+            self.spinner.alpha = 1.0
+        })
+
     }
     
     // MARK: UITextFieldDelegate
