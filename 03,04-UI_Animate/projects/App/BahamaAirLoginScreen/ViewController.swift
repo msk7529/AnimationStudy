@@ -54,6 +54,11 @@ final class ViewController: UIViewController {
     
     // MARK: further UI
     
+    private lazy var animationContainerView: UIView = {
+        let view = UIView(frame: view.bounds)
+        return view
+    }()
+    
     private lazy var spinner: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .large)
         view.frame = CGRect(x: -20.0, y: 6.0, width: 20.0, height: 20.0)
@@ -72,16 +77,17 @@ final class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        view.addSubview(animationContainerView)
+        view.addSubview(status)
         
-        // set up the UI
+        status.isHidden = true
+        status.center = loginButton.center
+        
         loginButton.addSubview(spinner)
         
         loginButton.layer.cornerRadius = 8.0
         loginButton.layer.masksToBounds = true
-        
-        status.isHidden = true
-        status.center = loginButton.center
-        view.addSubview(status)
         
         label.frame = CGRect(x: 0.0, y: 0.0, width: status.frame.size.width, height: status.frame.size.height)
         label.font = UIFont(name: "HelveticaNeue", size: 18.0)
@@ -162,6 +168,42 @@ final class ViewController: UIViewController {
           self.loginButton.center.y -= 30.0
           self.loginButton.alpha = 1.0
         }, completion: nil)
+        
+        // create new view
+        let newView = UIImageView(image: UIImage(named: "banner"))
+        newView.center = animationContainerView.center
+        
+        // 새로운 트랜지션을 생성한다. UIView.animate와 비슷하지만, 여기서는 매개변수로 컨테이너 역할을 하는 UIView를 필요로 한다.
+        UIView.transition(with: animationContainerView,
+                          duration: 3.0,
+                          options: [.curveEaseOut, .transitionFlipFromBottom],
+                          animations: {
+            // transitionFlipFromBottom: 뷰의 아래쪽 가장자리로 뷰를 뒤집는다.
+            self.animationContainerView.addSubview(newView)
+        }, completion: nil)
+        
+        /* remove the view via transition
+        UIView.transition(with: animationContainerView, duration: 0.33,
+          options: [.curveEaseOut, .transitionFlipFromBottom],
+          animations: {
+            // 뒤집기 애니메이션을 수행하고, someView는 마지막에 제거된다.
+            someView.removeFromSuperview()
+          }, completion: nil) */
+        
+        
+        /* hide the view via transition
+        UIView.transition(with: someView, duration: 0.33,
+                          options: [.curveEaseOut, .transitionFlipFromBottom],
+                          animations: {
+            someView.alpha = 0
+        }, completion: { _ in
+            //
+            someView.isHidden = true
+        }) */
+        
+        /* replace via transition. 이거 수행하면 전체 뷰가 플립 되는 효과가 생김;;;;
+        UIView.transition(from: password, to: username, duration: 0.33, options: .transitionFlipFromTop) */
+
     }
     
     // MARK: further methods
