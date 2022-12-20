@@ -223,7 +223,7 @@ final class ViewController: UIViewController {
     
     // MARK: further methods
 
-    @IBAction func login() {
+    @IBAction private func login() {
         view.endEditing(true)
         
         UIView.animate(withDuration: 1.5, delay: 0.0, usingSpringWithDamping: 0.2, initialSpringVelocity: 0.0, options: [], animations: {
@@ -242,7 +242,7 @@ final class ViewController: UIViewController {
         })
     }
     
-    func showMessage(index: Int) {
+    private func showMessage(index: Int) {
         statusLabel.text = statusMessages[index]
         
         UIView.transition(with: statusImageView, duration: 0.33,
@@ -256,14 +256,14 @@ final class ViewController: UIViewController {
                 if index < self.statusMessages.count - 1 {
                     self.removeMessage(index: index)
                 } else {
-                    //reset form
-                    // self.resetForm()
+                    // reset form
+                    self.resetForm()
                 }
             }
         })
     }
     
-    func removeMessage(index: Int) {
+    private func removeMessage(index: Int) {
         UIView.animate(withDuration: 0.33, delay: 0.0, options: [],
                        animations: {
             self.statusImageView.center.x += self.view.frame.size.width     // 화면 밖으로 빼낸다.
@@ -273,6 +273,23 @@ final class ViewController: UIViewController {
             
             self.showMessage(index: index + 1)
         })
+    }
+    
+    private func resetForm() {
+        UIView.transition(with: statusImageView, duration: 0.2, options: .transitionFlipFromTop, animations: {
+            // 상태표시 뷰를 다시 히든처리.
+            self.statusImageView.isHidden = true
+            self.statusImageView.center = self.statusPosition
+        }, completion: nil)
+        
+        UIView.animate(withDuration: 0.2, delay: 0.0, options: [], animations: {
+            // spinner 상태를 리셋시키고, 로그인 버튼의 위치와 색상을 초기화 한다.
+            self.spinner.center = CGPoint(x: -20.0, y: 16.0)
+            self.spinner.alpha = 0.0
+            self.loginButton.backgroundColor = UIColor(red: 0.63, green: 0.84, blue: 0.35, alpha: 1.0)
+            self.loginButton.bounds.size.width -= 80.0
+            self.loginButton.center.y -= 60.0
+        }, completion: nil)
     }
     
     // MARK: UITextFieldDelegate
