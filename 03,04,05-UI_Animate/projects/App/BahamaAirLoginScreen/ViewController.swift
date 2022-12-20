@@ -302,6 +302,7 @@ final class ViewController: UIViewController {
         
         UIView.animate(withDuration: TimeInterval(duration), delay: 0.0, options: .curveLinear, animations: {
             // 구름이 화면 밖을 완전히 벗어날때까지 x축 양의 방향으로 서서히 이동시키는 애니메이션을 수행
+            // curveLinear를 없애도 애니메이션 효과는 똑같은데, 구름이 화면 오른쪽을 완전히 벗어났을 때 왼쪽에서 바로 안 나타남.. 이유는 모르곘다.
             cloud.frame.origin.x = self.view.frame.size.width
         }, completion: { _ in
             // 구름이 화면 밖을 완전히 벗어나면, x좌표를 화면을 벗어난 시작지점으로 옮긴다
