@@ -98,6 +98,9 @@ final class ViewController: UIViewController {
         cloud2.alpha = 0.0
         cloud3.alpha = 0.0
         cloud4.alpha = 0.0
+        
+        loginButton.center.y += 30.0
+        loginButton.alpha = 0.0
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -137,6 +140,14 @@ final class ViewController: UIViewController {
         
         UIView.animate(withDuration: 0.5, delay: 1.1, options: [], animations: {
             self.cloud4.alpha = 1.0
+        }, completion: nil)
+        
+        // 각 값을 변경해보면서 실험해보자.
+        UIView.animate(withDuration: 0.5, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
+            // usingSpringWithDamping: 애니메이션이 최종 상태에 가까워질 때 애니메이션에 적용되는 감쇠(damping) 또는 감소(reduction)의 양을 제어. 0 ~ 1 사이 값으로 설정. 0에 가까울 수록 탄력 있는 애니메이션을 만들고, 1에 가까울 수록 뻣뻣해보이는 효과를 만든다. 이 값은 스프링의 강성(stiffness)으로 생각할 수 있다.
+            // initialSpringVelocity: 애니메이션의 초기 속도를 제어. 1은 1초 동안 전체 거리를 커버하도록 애니메이션의 초기 속도를 설정. 값이 크거나 작을 수록 애니메이션의 속도가 더 크거나 작아지고, 스프링이 안정되는 방식에 영향을 미친다. 그러나 초기 속도는 스프링 계산에 의해 곧 수정되며, 애니메이션은 항상 duration의 끝에 종료된다.
+          self.loginButton.center.y -= 30.0
+          self.loginButton.alpha = 1.0
         }, completion: nil)
     }
     
