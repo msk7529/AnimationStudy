@@ -106,6 +106,12 @@ final class ViewController: UIViewController {
             
             // 최하단 label에 3d 트랜지션 효과 부여
             cubeTransition(label: flightStatus, text: data.flightStatus, direction: direction)
+            
+            // 비행기에 keyframe 애니메이션 부여
+            planeDepart()
+            
+            // 최상단 summary label에 keyframe 애니메이션 부여
+            summarySwitch(to: data.summary)
         } else {
             bgImageView.image = UIImage(named: data.weatherImageName)
             snowView.isHidden = !data.showWeatherEffects
@@ -195,5 +201,57 @@ final class ViewController: UIViewController {
             label.alpha = 1.0
             label.transform = .identity
         })
+    }
+    
+    func planeDepart() {
+        let originalCenter = planeImage.center
+        
+        UIView.animateKeyframes(withDuration: 1.5, delay: 0.0, animations: {
+            // animateKeyframes은 특정한 프레임에서 시작점과 끝점을 지정하여 여러가지 효과를 적용하고자 할 때 사용한다.
+            // animateKeyframes을 사용하면, 특정 애니메이션을 keyframe 형태로 추가해야 한다.
+            
+            // add keyframes > 상대 지속시간을 사용
+            // withRelativeStartTime: animateKeyframes withDuration의 0.0배 후, 즉 1.5초 * 0.0 > 0초 후에 시작한다.
+            // relativeDuration: animateKeyframes withDuration의 0.25배 동안, 즉 1.5초 * 0.25 > 0.375 동안 재생된다.
+            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.25) {
+                self.planeImage.center.x += 80.0
+                self.planeImage.center.y -= 10.0
+            }
+            
+            UIView.addKeyframe(withRelativeStartTime: 0.1, relativeDuration: 0.4) {
+                self.planeImage.transform = CGAffineTransform(rotationAngle: -.pi / 8)
+            }
+            
+            UIView.addKeyframe(withRelativeStartTime: 0.25, relativeDuration: 0.25) {
+                self.planeImage.center.x += 100.0
+                self.planeImage.center.y -= 50.0
+                self.planeImage.alpha = 0.0
+            }
+            
+            UIView.addKeyframe(withRelativeStartTime: 0.51, relativeDuration: 0.01) {
+                self.planeImage.transform = .identity
+                self.planeImage.center = CGPoint(x: 0.0, y: originalCenter.y)
+            }
+            
+            UIView.addKeyframe(withRelativeStartTime: 0.55, relativeDuration: 0.45) {
+                self.planeImage.alpha = 1.0
+                self.planeImage.center = originalCenter     // 원래 위치로 되돌린다.
+            }
+        }, completion: nil)
+    }
+    
+    func summarySwitch(to summaryText: String) {
+        UIView.animateKeyframes(withDuration: 1.0, delay: 0.0, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 0.0, relativeDuration: 0.45) {
+                self.summary.center.y -= 100.0
+            }
+            UIView.addKeyframe(withRelativeStartTime: 0.5, relativeDuration: 0.45) {
+                self.summary.center.y += 100.0
+            }
+        }, completion: nil)
+        
+        delay(seconds: 0.5) {
+            self.summary.text = summaryText
+        }
     }
 }
