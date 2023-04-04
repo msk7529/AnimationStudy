@@ -1,0 +1,3 @@
+- transitionCrossDissolve 옵션을 통한 fade 효과 부여
+- CGAffineTransform를 통한 3d 효과 부여
+- CAEmitterLayer를 이용한 애니메이션 효과
